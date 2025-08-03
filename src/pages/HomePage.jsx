@@ -8,7 +8,7 @@ function HomePage(){
                     <HeroSection />
 
             <section className="container mx-auto px-4 py-16">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     <ProductsCard 
                         image="https://placehold.co/400x533/f5f5f7/333?text=Paddle+Series+X"
                         alt="Pickleball Paddle"
