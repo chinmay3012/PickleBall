@@ -179,9 +179,8 @@ function Navbar(){
               {isLoading ? (
                       <p>Loading...</p>
                     ) : isAuthenticated ? (
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center md:gap-4 gap-2">
                         <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full" />
-                        <span>{user.name}</span>
                         <LogoutButton />
                       </div>
                     ) : (
