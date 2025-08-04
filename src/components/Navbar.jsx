@@ -106,8 +106,8 @@ function Navbar(){
                       <LoginMobile />
                     )}
             <div className="ml-2">
-                <a href="/" className="text-xl font-semibold text-black transition-colors duration-300 ease-in-out 
-                hover:bg-clip-text hover:text-transparent hover:bg-gradient-to-r hover:from-red-500 hover:to-green-500">PICKLESHOP</a>
+                <a href="/" className="text-xl font-bold text-bl transition-colors duration-300 ease-in-out 
+                hover:bg-clip-text hover:text-transparent hover:bg-gradient-to-r hover:from-red-500 hover:to-green-500 font-serif">PICKLESHOP</a>
             </div>
             <div className="relative hidden md:flex text-sm" ref={topGearRef}>
             <button 
