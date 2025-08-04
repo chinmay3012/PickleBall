@@ -17,10 +17,10 @@ function App(){
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage/>} />
-          <Route path="https://picklewear.netlify.app/home" element={<HomePage/>} />
-          <Route path="https://picklewear.netlify.app/about" element={<AboutPage/>} />
-          <Route path="https://picklewear.netlify.app/products" element={<ProductPage/>} />
-          <Route path="https://picklewear.netlify.app/contact" element={<ContactPage/>} />
+          <Route path="/home" element={<HomePage/>} />
+          <Route path="/about" element={<AboutPage/>} />
+          <Route path="/products" element={<ProductPage/>} />
+          <Route path="/contact" element={<ContactPage/>} />
           <Route path="*" element={<ErrorPage/>}/>
         </Routes>
         <Outlet />
