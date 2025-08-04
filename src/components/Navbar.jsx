@@ -4,6 +4,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import LoginButton from "./LoginButton";
 import LogoutButton from "./LogoutButton";
 import Sidemenu from "./Sidemenu";
+import LoginMobile from "./LoginMobile";
 
 function Navbar(){
 
@@ -94,8 +95,18 @@ function Navbar(){
         `}
       </style>
         <nav className="mt-6 flex sticky items-center justify-between px-10 mb-1 top-0 z-20 bg-white">
-            <div>
-                <a href="/" className="text-lg md:text-xl font-semibold text-black transition-colors duration-300 ease-in-out 
+        {isLoading ? (
+                      <p>Loading...</p>
+                    ) : isAuthenticated ? (
+                      <div className="flex items-center md:gap-4 gap-2">
+                        <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full" />
+                        <LogoutButton />
+                      </div>
+                    ) : (
+                      <LoginMobile />
+                    )}
+            <div className="ml-2">
+                <a href="/" className="text-xl font-semibold text-black transition-colors duration-300 ease-in-out 
                 hover:bg-clip-text hover:text-transparent hover:bg-gradient-to-r hover:from-red-500 hover:to-green-500">PICKLESHOP</a>
             </div>
             <div className="relative hidden md:flex text-sm" ref={topGearRef}>
@@ -162,7 +173,7 @@ function Navbar(){
             )}
           </div>
             {/* Search Icon */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1">
             <button className="p-2 rounded-full hover:bg-gray-100 transition-colors hover:cursor-pointer" onClick={()=>setSearchQuery(!searchQuery)}>
             <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -189,13 +200,16 @@ function Navbar(){
                     )}
 
 
-          {/* Updated cart button*/}
-          <button className="p-2 rounded-full hover:bg-gray-100 transition-colors hover:cursor-pointer">
-            <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2a4 4 0 0 1 4 4v2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h2V6a4 4 0 0 1 4-4zM6 10v10h12V10H6zm6-6a2 2 0 0 0-2 2v2h4V6a2 2 0 0 0-2-2z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
+          {isAuthenticated && (
+            <button className="p-2 rounded-full hover:bg-gray-100 transition-colors hover:cursor-pointer">
+              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2a4 4 0 0 1 4 4v2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h2V6a4 4 0 0 1 4-4zM6 10v10h12V10H6zm6-6a2 2 0 0 0-2 2v2h4V6a2 2 0 0 0-2-2z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          )}
             </div>
+
+
           {/* Hamburger Menu for Mobile */}
           <div className="md:hidden pt-1.5">
             <Sidemenu />

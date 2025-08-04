@@ -18,7 +18,7 @@ function Sidemenu(){
                     <HamburgerIcon/>
                 </button>
                 {isMenuOpen && (
-                    <div className={`fixed top-0 right-0 w-[45%] transition-transform duration-500 h-full z-50 ease-in-out bg-white
+                    <div className={`fixed top-0 right-0 w-[55%] transition-transform duration-500 h-full z-50 ease-in-out bg-white
                     rounded-lg ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
                     >
                         <button onClick={toggleMenu} className="absolute top-10 right-7">
