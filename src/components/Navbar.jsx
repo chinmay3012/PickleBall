@@ -5,6 +5,7 @@ import LoginButton from "./LoginButton";
 import LogoutButton from "./LogoutButton";
 import Sidemenu from "./Sidemenu";
 import LoginMobile from "./LoginMobile";
+import LogoutMobile from "./LogoutMobile";
 
 function Navbar(){
 
@@ -99,8 +100,7 @@ function Navbar(){
                       <p>Loading...</p>
                     ) : isAuthenticated ? (
                       <div className="flex items-center md:gap-4 gap-2">
-                        <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full" />
-                        <LogoutButton />
+                        <LogoutMobile />
                       </div>
                     ) : (
                       <LoginMobile />
