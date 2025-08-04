@@ -6,7 +6,7 @@ const LogoutMobile = () => {
   return (
     <>
     <button onClick={() => loginWithRedirect()} className="md:hidden text-sm text-black hover:cursor-pointer no-underline shadow-xl p-1.5 rounded font-semibold">
-      Log In
+      Log Out
     </button>
     </>
     
