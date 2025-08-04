@@ -3,6 +3,7 @@ import Marquee from "react-fast-marquee";
 import { useAuth0 } from "@auth0/auth0-react";
 import LoginButton from "./LoginButton";
 import LogoutButton from "./LogoutButton";
+import Sidemenu from "./Sidemenu";
 
 function Navbar(){
 
@@ -195,6 +196,10 @@ function Navbar(){
             </svg>
           </button>
             </div>
+          {/* Hamburger Menu for Mobile */}
+          <div className="md:hidden">
+            <Sidemenu />
+          </div>
         </nav>
 
         {/*Search Bar*/} 
