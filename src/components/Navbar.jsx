@@ -197,7 +197,7 @@ function Navbar(){
           </button>
             </div>
           {/* Hamburger Menu for Mobile */}
-          <div className="md:hidden">
+          <div className="md:hidden pt-1.5">
             <Sidemenu />
           </div>
         </nav>
