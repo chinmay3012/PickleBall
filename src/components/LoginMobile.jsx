@@ -5,7 +5,7 @@ const LoginMobile = () => {
   const { loginWithRedirect } = useAuth0();
   return (
     <>
-    <button onClick={() => loginWithRedirect()} className="md:hidden text-sm text-black hover:cursor-pointer no-underline shadow-xl p-1.5 px-2 rounded font-semibold">
+    <button onClick={() => loginWithRedirect()} className="md:hidden text-sm text-black hover:cursor-pointer no-underline shadow-xl p-1.5 rounded font-semibold">
       Log In
     </button>
     </>

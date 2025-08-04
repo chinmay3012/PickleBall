@@ -94,7 +94,7 @@ function Navbar(){
           }
         `}
       </style>
-        <nav className="mt-6 flex sticky items-center justify-between px-10 mb-1 top-0 z-20 bg-white">
+        <nav className="mt-6 flex sticky items-center justify-between px-4 mb-1 top-0 z-20 bg-white">
         {isLoading ? (
                       <p>Loading...</p>
                     ) : isAuthenticated ? (
