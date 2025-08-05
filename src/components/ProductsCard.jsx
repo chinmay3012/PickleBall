@@ -1,11 +1,16 @@
-import { useCart } from "../context/CartContext";
+import { useState } from "react";
+import { useCart } from "../context/CartContext"; // or useContext directly
 
 function ProductsCard({ image, alt, title, price }) {
-  const { addToCart } = useCart();
+  const [added, setAdded] = useState(false);
+  const { addToCart } = useCart(); // replace with your context import
 
   const handleAddToCart = () => {
-    const product = { image, alt, title, price, id: Date.now() }; // Add `id` to avoid key issues
-    addToCart(product);
+    addToCart({ image, alt, title, price });
+    setAdded(true);
+    setTimeout(() => {
+      setAdded(false);
+    }, 2000); // show "Added to Cart" for 2 seconds
   };
 
   return (
@@ -23,10 +28,13 @@ function ProductsCard({ image, alt, title, price }) {
       </div>
       <div>
         <button
-          className="justify-center w-full bg-black text-white py-2 px-2 rounded-b-lg hover:bg-gray-800 transition-colors items-center flex cursor-pointer"
           onClick={handleAddToCart}
+          disabled={added}
+          className={`justify-center w-full py-2 px-2 rounded-b-lg flex items-center transition-colors ${
+            added ? "bg-green-500" : "bg-black hover:bg-gray-800"
+          } text-white cursor-pointer`}
         >
-          Add to Cart
+          {added ? "Added to Cart" : "Add to Cart"}
         </button>
       </div>
     </div>
