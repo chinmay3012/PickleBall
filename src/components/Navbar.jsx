@@ -136,7 +136,7 @@ function Navbar(){
           {/* Apparel Dropdown */}
           <div className="relative hidden md:flex text-sm" ref={apparelRef}>
             <button 
-              className="flex items-center gap-1 focus:outline-none hover:text-black transition-colors"
+              className="flex items-center gap-1 focus:outline-none hover:text-green-600 transition-colors"
               onClick={() => toggleDropdown('apparel')}
             >
               APPAREL
@@ -158,7 +158,7 @@ function Navbar(){
           {/* Accessories Dropdown */}
           <div className="relative hidden md:flex text-sm" ref={accessoriesRef}>
             <button 
-              className="flex items-center gap-1 focus:outline-none hover:text-black transition-colors"
+              className="flex items-center gap-1 focus:outline-none hover:text-green-600 transition-colors"
               onClick={() => toggleDropdown('accessories')}
             >
               ACCESSORIES
