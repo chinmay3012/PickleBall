@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter , Routes , Route , useNavigate , Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
@@ -7,28 +7,28 @@ import HomePage from "./pages/HomePage.jsx";
 import AboutPage from "./pages/AboutPage.jsx";
 import ProductPage from "./pages/ProductPage.jsx";
 import ContactPage from "./pages/Contact.jsx";
+import CartPage from "./pages/CartPage.jsx";
 
-function App(){
-    return(
-
-      <>
+function App() {
+  return (
+    <BrowserRouter>
       <div className="font-sans min-h-screen font-['system-ui', 'apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif']">
-      <Navbar />
-      <BrowserRouter>
+        <Navbar />
+
         <Routes>
-          <Route path="/" element={<HomePage/>} />
-          <Route path="/home" element={<HomePage/>} />
-          <Route path="/about" element={<AboutPage/>} />
-          <Route path="/products" element={<ProductPage/>} />
-          <Route path="/contact" element={<ContactPage/>} />
-          <Route path="*" element={<ErrorPage/>}/>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/products" element={<ProductPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="*" element={<ErrorPage />} />
         </Routes>
-        <Outlet />
-      </BrowserRouter>
-      <Footer />
+
+        <Footer />
       </div>
-      </>
-    )
+    </BrowserRouter>
+  );
 }
 
 function ErrorPage() {

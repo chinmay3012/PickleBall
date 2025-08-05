@@ -1,11 +1,14 @@
 import { useState , useEffect , useRef } from "react";
 import Marquee from "react-fast-marquee";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useNavigate } from "react-router-dom";
+
 import LoginButton from "./LoginButton";
 import LogoutButton from "./LogoutButton";
 import Sidemenu from "./Sidemenu";
 import LoginMobile from "./LoginMobile";
 import LogoutMobile from "./LogoutMobile";
+import CartPage from "../pages/CartPage";
 
 function Navbar(){
 
@@ -15,6 +18,7 @@ function Navbar(){
     const [isAccessoriesOpen, setIsAccessoriesOpen] = useState(false);
 
     const { isAuthenticated, user, isLoading } = useAuth0();
+    const navigate = useNavigate();
 
     // Refs for each dropdown to check for outside clicks
   const topGearRef = useRef(null);
@@ -200,8 +204,9 @@ function Navbar(){
                     )}
 
 
+          
           {isAuthenticated && (
-            <button className="p-2 rounded-full hover:bg-gray-100 transition-colors hover:cursor-pointer">
+            <button className="p-2 rounded-full hover:bg-gray-100 transition-colors hover:cursor-pointer" onClick={()=>navigate("/cart")}>
               <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2a4 4 0 0 1 4 4v2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h2V6a4 4 0 0 1 4-4zM6 10v10h12V10H6zm6-6a2 2 0 0 0-2 2v2h4V6a2 2 0 0 0-2-2z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
