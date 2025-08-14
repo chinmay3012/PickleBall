@@ -71,7 +71,7 @@ function CheckoutPage() {
   const navigate = useNavigate();
 
   const [address, setAddress] = useState("");
-  const [paymentMode, setPaymentMode] = useState("COD");
+  const [paymentMode, setPaymentMode] = useState("Pay Online");
 
   // Load saved address from localStorage
   useEffect(() => {
@@ -88,9 +88,38 @@ function CheckoutPage() {
     // Save address
     localStorage.setItem("userAddress", address);
 
-    // Payment mode and cart could be sent to backend here
-    alert(`Order placed successfully!\nPayment: ${paymentMode}`);
-    navigate("/"); // Go back to home after placing order
+    const totalAmount = cartItems.reduce(
+      (sum, item) =>
+        sum +
+        parseFloat(item.price.replace("Rs. ", "").replace(",", "")) * item.quantity,
+      0
+    );
+
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID , // Replace with your Razorpay Key ID
+      amount: totalAmount * 100 , // in paise
+      currency: "INR",
+      name: "PickleBall Store",
+      description: "Order Payment",
+      handler: function (response) {
+        alert(
+          "Order placed successfully! Payment ID: " +
+            response.razorpay_payment_id
+        );
+        navigate("/");
+      },
+      prefill: {
+        name: "Customer Name",
+        email: "customer@example.com",
+        contact: "9999999999",
+      },
+      theme: {
+        color: "#3399cc",
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
   };
 
   return (
@@ -130,7 +159,9 @@ function CheckoutPage() {
       {/* Order Summary */}
       <div className="border-t pt-4">
         <h2 className="text-xl font-semibold mb-2">Order Summary</h2>
-        <p>Total Items: {cartItems.reduce((sum, item) => sum + item.quantity, 0)}</p>
+        <p>
+          Total Items: {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+        </p>
         <p className="font-medium">
           Total Price: Rs.{" "}
           {cartItems
@@ -146,21 +177,14 @@ function CheckoutPage() {
       </div>
 
       {/* Place Order */}
-     {/* Place Order */}
-        <a
-        href="https://razorpay.me/@chinmaymehrotra"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-6 block w-full bg-green-500 text-white text-center py-2 rounded hover:bg-green-600"
+      <button
         onClick={handlePlaceOrder}
-        >
+        className="mt-6 w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
+      >
         Place Order
-        </a>
-
-      
+      </button>
     </div>
   );
 }
 
 export default CheckoutPage;
-// This component handles the checkout process, including address input and payment method selection.
