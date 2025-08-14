@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 
 function CartPage() {
-  const { cartItems } = useCart();
+  const { cartItems, removeFromCart } = useCart();
   const navigate = useNavigate();
 
   return (
@@ -20,6 +20,12 @@ function CartPage() {
               <div>
                 <h3 className="font-semibold">{item.title}</h3>
                 <p>{item.price}</p>
+                <p className="text-xs text-gray-500">Qty: {item.quantity}</p> 
+                <button
+                  onClick={() => removeFromCart(item.id)}
+                  className="px-2 py-1 bg-black text-white rounded hover:bg-red-600 text-sm mt-1">
+                  Remove
+                </button>
               </div>
             </div>
           ))}
