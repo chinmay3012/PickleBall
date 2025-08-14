@@ -112,7 +112,7 @@ function CheckoutPage() {
       <div className="mb-6">
         <label className="block font-medium mb-2">Payment Method</label>
         <div className="space-y-2">
-          {["COD", "Card", "UPI"].map((method) => (
+          {["Pay Online"].map((method) => (
             <label key={method} className="flex items-center space-x-2">
               <input
                 type="radio"
@@ -147,9 +147,8 @@ function CheckoutPage() {
 
       {/* Place Order */}
       <button
-        onClick={handlePlaceOrder}
-        className="mt-6 w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
-      >
+        onClick={handlePlaceOrder} href="https://razorpay.me/@chinmaymehrotra"
+        className="mt-6 w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">
         Place Order
       </button>
     </div>
