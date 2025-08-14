@@ -73,10 +73,32 @@ function CheckoutPage() {
   const [address, setAddress] = useState("");
   const [paymentMode, setPaymentMode] = useState("Pay Online");
 
-  // Load saved address from localStorage
+  // State to track Razorpay script loading
+  const [isRazorpayLoaded, setIsRazorpayLoaded] = useState(false);
+
+  // Load saved address from localStorage and Razorpay script
   useEffect(() => {
     const savedAddress = localStorage.getItem("userAddress");
-    if (savedAddress) setAddress(savedAddress);
+    if (savedAddress) {
+      setAddress(savedAddress);
+    }
+  }, []);
+
+  // Effect to load the Razorpay script
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => {
+      setIsRazorpayLoaded(true);
+    };
+    script.onerror = () => {
+      console.error("Razorpay SDK failed to load.");
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
   }, []);
 
   const handlePlaceOrder = () => {
@@ -85,23 +107,30 @@ function CheckoutPage() {
       return;
     }
 
-    // Save address
+    // Check if the Razorpay script has loaded
+    if (!isRazorpayLoaded) {
+      alert("Payment gateway is not ready. Please try again in a moment.");
+      return;
+    }
+
     localStorage.setItem("userAddress", address);
 
     const totalAmount = cartItems.reduce(
       (sum, item) =>
         sum +
-        parseFloat(item.price.replace("Rs. ", "").replace(",", "")) * item.quantity,
+        parseFloat(item.price.replace("Rs. ", "").replace(",", "")) *
+        item.quantity,
       0
     );
 
     const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID , // Replace with your Razorpay Key ID
-      amount: totalAmount * 100 , // in paise
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Your Razorpay Key ID from .env
+      amount: Math.round(totalAmount * 100), // convert to paisa and ensure it's an integer
       currency: "INR",
       name: "PickleBall Store",
       description: "Order Payment",
       handler: function (response) {
+        // This callback is called only on successful payment
         alert(
           "Order placed successfully! Payment ID: " +
             response.razorpay_payment_id
