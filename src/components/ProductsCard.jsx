@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useCart } from "../context/CartContext"; // or useContext directly
 
-function ProductsCard({ image, alt, title, price }) {
+function ProductsCard({ id, image, alt, title, price }) {
   const [added, setAdded] = useState(false);
   const { addToCart } = useCart(); // replace with your context import
 
   const handleAddToCart = () => {
-    addToCart({ image, alt, title, price });
+    addToCart({ id ,image, alt, title, price });
     setAdded(true);
     setTimeout(() => {
       setAdded(false);
