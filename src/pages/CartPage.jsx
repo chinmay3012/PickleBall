@@ -43,7 +43,7 @@ function CartPage() {
             </span>
           </div>
           <div>
-          <button className="mt-4 w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">
+          <button className="mt-4 w-full bg-green-500 text-white py-2 rounded hover:bg-green-600" onClick={() => navigate("/checkout")}>
             Proceed to Checkout
           </button>
         </div>
