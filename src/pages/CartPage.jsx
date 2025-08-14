@@ -1,5 +1,6 @@
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
+import React from "react";
 
 
 function CartPage() {
@@ -18,7 +19,7 @@ function CartPage() {
             <div key={item.id || index} className="flex items-center gap-4 border p-4 rounded shadow">
               <img src={item.image} alt={item.alt} className="w-20 h-20 object-cover rounded" />
               <div>
-                <h3 className="font-semibold">{item.title}</h3>
+                <h3 className="font-semibold text-lg">{item.title}</h3>
                 <p>{item.price}</p>
                 <p className="text-xs text-gray-500">Qty: {item.quantity}</p> 
                 <button
@@ -32,14 +33,30 @@ function CartPage() {
         </div>
       )}
 
-      <div className="text-center mt-10">
-        <button
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          onClick={() => navigate("/home")}
-        >
-          Continue Shopping
-        </button>
-      </div>
+      {cartItems.length > 0 && (
+        <div className="max-w-xl mx-auto mt-8 p-4 border rounded shadow">
+          <h2 className="text-2xl font-semibold mb-4">Cart Summary</h2>
+          <div className="flex justify-between py-2 border-b">
+            <span className="font-medium">Total:</span>
+            <span className="font-medium">
+              Rs. {cartItems.reduce((sum, item) => sum + parseFloat(item.price.replace('Rs. ', '').replace(',', '')) * item.quantity, 0).toFixed(2)}
+            </span>
+          </div>
+          <div>
+          <button className="mt-4 w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">
+            Proceed to Checkout
+          </button>
+        </div>
+        </div>
+      )}
+
+        <div className="flex justify-center">
+          <button
+            onClick={() => navigate("/")}
+            className="mt-4 p-2.5 bg-blue-500 text-white rounded hover:bg-blue-600">
+            Continue Shopping
+          </button>
+        </div>
     </div>
   );
 }
