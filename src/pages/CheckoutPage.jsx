@@ -146,11 +146,17 @@ function CheckoutPage() {
       </div>
 
       {/* Place Order */}
-      <a href="https://razorpay.me/@chinmaymehrotra" rel="noopener noreferrer"><button
+     {/* Place Order */}
+        <a
+        href="https://razorpay.me/@chinmaymehrotra"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-6 block w-full bg-green-500 text-white text-center py-2 rounded hover:bg-green-600"
         onClick={handlePlaceOrder}
-        className="mt-6 w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">
+        >
         Place Order
-      </button></a>
+        </a>
+
       
     </div>
   );
