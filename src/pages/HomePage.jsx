@@ -14,7 +14,7 @@ function HomePage(){
                         image="https://placehold.co/400x533/f5f5f7/333?text=Paddle+Series+X"
                         alt="Pickleball Paddle"
                         title="Pro-Spin Paddle"
-                        price="8,999"
+                        price="Rs. 10.00"
                         />
                         <ProductsCard 
                         id={2}
