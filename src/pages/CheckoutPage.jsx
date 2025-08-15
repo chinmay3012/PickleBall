@@ -3,20 +3,6 @@ import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 
 /* Robust price parser: returns rupees as a Number (not paise). */
-function parsePrice(value) {
-  if (typeof value === "number") return value;
-  if (!value && value !== 0) return 0;
-  const s = String(value).trim();
-  // Remove any non-digit except a single dot.
-  // Keep only first dot if multiple (rare).
-  const cleaned = s.replace(/[^0-9.]/g, "");
-  // If multiple dots, keep the first decimal point portion only:
-  const parts = cleaned.split(".");
-  const normalized = parts.length > 1 ? parts.shift() + "." + parts.join("") : parts[0];
-  const n = parseFloat(normalized);
-  return Number.isFinite(n) ? n : 0;
-}
-
 function formatINR(n) {
   const numberToFormat = Number.isFinite(n) ? n : 0;
   return new Intl.NumberFormat("en-IN", {
