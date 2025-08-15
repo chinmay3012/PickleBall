@@ -186,11 +186,11 @@ export default function CheckoutPage() {
     }
 
     const keyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
-    if (!keyId) {
-      setProcessing(false);
-      alert("Razorpay Key ID is missing. Add VITE_RAZORPAY_KEY_ID to .env and restart.");
-      return;
-    }
+    // if (!keyId) {
+    //   setProcessing(false);
+    //   alert("Razorpay Key ID is missing. Add VITE_RAZORPAY_KEY_ID to .env and restart.");
+    //   return;
+    // }
 
     // Fix: Use Math.round() to ensure a whole number of paise
     const amountPaise = Math.round(totalAmount * 100);
