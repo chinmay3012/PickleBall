@@ -8,8 +8,9 @@ function CheckoutPage() {
 
   const getCartTotal = () => {
     return cartItems.reduce((sum, item) => {
-      const cleaned = String(item.price).replace(/[^0-9]/g, "");
-      const price = Number(cleaned) || 0;
+      const price = parseFloat(
+        String(item.price).replace("Rs. ", "").replace(",", "")
+      );
       return sum + price * item.quantity;
     }, 0);
   };
@@ -34,11 +35,8 @@ function CheckoutPage() {
 
     const totalAmount = getCartTotal();
 
-    const keyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
-console.log(keyId); // should print your test key
-
     const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID , // Your Razorpay key ID
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
       amount: totalAmount * 100, // convert to paisa
       currency: "INR",
       name: "PickleBall Store",
@@ -74,7 +72,7 @@ console.log(keyId); // should print your test key
         <h2 className="text-2xl font-semibold mb-4">Order Summary</h2>
         <div className="flex justify-between py-2 border-b">
           <span>Total:</span>
-          <span>Rs. {getCartTotal().toLocaleString("en-IN")}</span>
+          <span>Rs. {getCartTotal().toFixed(2)}</span>
         </div>
         <button
           onClick={handlePayment}
