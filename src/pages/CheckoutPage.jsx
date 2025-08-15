@@ -1,95 +1,33 @@
-// import React, { useState, useEffect } from 'react';
-// import { loadStripe } from '@stripe/stripe-js';
-// import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-// import axios from 'axios';
-// import { useCart } from '../context/CartContext';
-// import { useNavigate } from 'react-router-dom';
-
-// const stripePromise = loadStripe('YOUR_STRIPE_PUBLISHABLE_KEY'); // Replace with your actual publishable key
-
-// const CheckoutForm = () => {
-//   const [succeeded, setSucceeded] = useState(false);
-//   const [error, setError] = useState(null);
-//   const [processing, setProcessing] = useState('');
-//   const [disabled, setDisabled] = useState(true);
-//   const [clientSecret, setClientSecret] = useState('');
-//   const stripe = useStripe();
-//   const elements = useElements();
-//   const { cartItems, clearCart } = useCart();
-//   const navigate = useNavigate();
-
-//   useEffect(() => {
-//     // Create PaymentIntent as soon as the page loads
-//     const totalAmount = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-//     if (totalAmount > 0) {
-//       axios.post('/create-payment-intent', { amount: totalAmount * 100 }) // amount in cents
-//         .then(res => {
-//           setClientSecret(res.data.clientSecret);
-//         })
-//         .catch(err => {
-//           console.error("Error creating payment intent:", err);
-//           setError("Failed to initialize checkout. Please try again.");
-//         });
-//     }
-//   }, [cartItems]);
-
-//   const handleChange = async (event) => {
-//     // Listen for changes in the CardElement
-//     // and display any errors as the customer types their card details
-//     setDisabled(event.empty);
-//     setError(event.error ? event.error.message : "");
-//   };
-
-//   const handleSubmit = async (ev) => {
-//     ev.preventDefault();
-//     setProcessing(true);
-
-//     if (!stripe || !elements) {
-//       // Stripe.js has not yet loaded.
-//       // Make sure to disable form submission until Stripe.js has loaded.
-//     }
-// }
-// }
-
-// export default CheckoutPage(){
-//     return (
-//         <div className="min-h-screen p-8">
-//         <h1 className="text-4xl font-bold mb-6 text-center">Checkout</h1>
-//         <Elements stripe={stripePromise}>
-//             <CheckoutForm />
-//         </Elements>
-//         </div>
-//     );
-// }
-
-// src/pages/CheckoutPage.jsx
 import React, { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 
+/* Robust price parser: returns rupees as a Number (not paise). */
 function parsePrice(value) {
-    if (typeof value === "number") return value;
-  
-    // Remove currency symbols and commas
-    const cleaned = String(value).replace(/[^0-9.]/g, "");
-    const n = parseFloat(cleaned);
-  
-    // If invalid, return 0
-    return Number.isFinite(n) ? n : 0;
-  }
-  
-  function formatINR(n) {
-    const numberToFormat = Number.isFinite(n) ? n : 0;
-  
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(numberToFormat);
-  }
-  
+  if (typeof value === "number") return value;
+  if (!value && value !== 0) return 0;
+  const s = String(value).trim();
+  // Remove any non-digit except a single dot.
+  // Keep only first dot if multiple (rare).
+  const cleaned = s.replace(/[^0-9.]/g, "");
+  // If multiple dots, keep the first decimal point portion only:
+  const parts = cleaned.split(".");
+  const normalized = parts.length > 1 ? parts.shift() + "." + parts.join("") : parts[0];
+  const n = parseFloat(normalized);
+  return Number.isFinite(n) ? n : 0;
+}
 
+function formatINR(n) {
+  const numberToFormat = Number.isFinite(n) ? n : 0;
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(numberToFormat);
+}
+
+/* Load Razorpay SDK on demand */
 function loadRazorpaySDK(timeout = 10000) {
   return new Promise((resolve, reject) => {
     if (typeof window === "undefined") return reject(new Error("No window"));
@@ -97,7 +35,6 @@ function loadRazorpaySDK(timeout = 10000) {
 
     const existing = document.getElementById("razorpay-sdk");
     if (existing) {
-      // script present but not ready yet — poll for a short time
       let waited = 0;
       const iv = setInterval(() => {
         if (window.Razorpay) {
@@ -131,117 +68,108 @@ export default function CheckoutPage() {
   const [sdkReady, setSdkReady] = useState(false);
   const [processing, setProcessing] = useState(false);
 
-  // Load address once
+  // load address
   useEffect(() => {
     const saved = localStorage.getItem("userAddress");
     if (saved) setAddress(saved);
   }, []);
 
-  // Attempt to pre-load SDK on mount (non-blocking)
+  // pre-load SDK (non-blocking)
   useEffect(() => {
     let mounted = true;
     loadRazorpaySDK()
-      .then(() => {
-        if (mounted) setSdkReady(true);
-      })
-      .catch(() => {
-        if (mounted) setSdkReady(false);
-      });
-    return () => {
-      mounted = false;
-    };
+      .then(() => mounted && setSdkReady(true))
+      .catch(() => mounted && setSdkReady(false));
+    return () => { mounted = false; };
   }, []);
 
-  // single total calculation used for display and payment
-  const totalAmount = cartItems.reduce((sum, item) => {
-    const price = parsePrice(item.price);
-    const qty = Number.isFinite(item.quantity) ? item.quantity : 1;
-    return sum + price * qty;
-  }, 0);
+  // single source-of-truth totals
+  const itemsParsed = cartItems.map((it) => {
+    const price = parsePrice(it.price ?? it.priceNumber ?? it.amount);
+    const qty = Number.isFinite(it.quantity) ? it.quantity : 1;
+    return { ...it, priceNum: price, qty, lineTotal: price * qty };
+  });
 
-  const totalItems = cartItems.reduce((sum, item) => {
-    const qty = Number.isFinite(item.quantity) ? item.quantity : 1;
-    return sum + qty;
-  }, 0);
+  const totalAmount = itemsParsed.reduce((s, it) => s + it.lineTotal, 0);
+  const totalItems = itemsParsed.reduce((s, it) => s + it.qty, 0);
 
   const handlePlaceOrder = async () => {
     if (!address.trim()) {
       alert("Please enter your address.");
       return;
     }
-    if (cartItems.length === 0 || totalAmount <= 0) {
-      alert("Cart is empty or total is zero.");
+    if (!cartItems.length) {
+      alert("Cart is empty.");
       return;
     }
 
     setProcessing(true);
 
-    try {
-      await loadRazorpaySDK(); // ensure SDK loaded (wait if needed)
-      setSdkReady(true);
-    } catch (err) {
+    // debug logs — copy these if you report back
+    console.log("DEBUG: cartItems raw:", cartItems);
+    console.log("DEBUG: itemsParsed:", itemsParsed);
+    console.log("DEBUG: totalAmount (rupees):", totalAmount);
+
+    const amountPaise = Math.round(totalAmount * 100);
+    console.log("DEBUG: amountPaise:", amountPaise);
+    console.log("DEBUG: VITE_RAZORPAY_KEY_ID:", import.meta.env.VITE_RAZORPAY_KEY_ID);
+
+    if (!import.meta.env.VITE_RAZORPAY_KEY_ID) {
       setProcessing(false);
-      alert("Payment gateway failed to load. Check your connection.");
+      alert("Razorpay Key ID is missing. Add VITE_RAZORPAY_KEY_ID to .env and rebuild/deploy.");
       return;
     }
 
-    const keyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
-    // if (!keyId) {
-    //   setProcessing(false);
-    //   alert("Razorpay Key ID is missing. Add VITE_RAZORPAY_KEY_ID to .env and restart.");
-    //   return;
-    // }
+    if (amountPaise <= 0) {
+      setProcessing(false);
+      alert("Total amount is zero. Check item prices.");
+      return;
+    }
 
-    // Fix: Use Math.round() to ensure a whole number of paise
-    const amountPaise = Math.round(totalAmount * 100);
-    const orderIdFallback = `${Date.now()}`;
+    try {
+      await loadRazorpaySDK();
+      setSdkReady(true);
+    } catch (err) {
+      setProcessing(false);
+      alert("Payment SDK failed to load. Try again.");
+      return;
+    }
 
     const options = {
-      key: keyId,
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
       amount: amountPaise,
       currency: "INR",
       name: "PickleBall Store",
       description: "Order Payment",
-      order_id: undefined, // optional when no backend order creation
-      prefill: {
-        name: "",
-        email: "",
-        contact: "",
-      },
+      prefill: { name: "", email: "", contact: "" },
       theme: { color: "#3399cc" },
       handler: function (response) {
-        // successful payment callback
-        try {
-          // build local order record
-          const orderRecord = {
-            id: response?.razorpay_payment_id ? response.razorpay_payment_id : orderIdFallback,
-            paymentId: response?.razorpay_payment_id || null,
-            items: cartItems,
-            amount: totalAmount,
-            currency: "INR",
-            address,
-            createdAt: new Date().toISOString(),
-            verified: false, // cannot verify without backend
-          };
+        // Payment successful callback
+        const orderRecord = {
+          id: response?.razorpay_payment_id ?? `local_${Date.now()}`,
+          paymentId: response?.razorpay_payment_id ?? null,
+          items: itemsParsed,
+          amount: totalAmount,
+          currency: "INR",
+          address,
+          createdAt: new Date().toISOString(),
+        };
 
-          // save to localStorage orders list
-          const key = "pb_orders_v1";
-          const existing = JSON.parse(localStorage.getItem(key) || "[]");
-          existing.unshift(orderRecord);
-          localStorage.setItem(key, JSON.stringify(existing));
+        // save orders locally
+        const key = "pb_orders_v1";
+        const existing = JSON.parse(localStorage.getItem(key) || "[]");
+        existing.unshift(orderRecord);
+        localStorage.setItem(key, JSON.stringify(existing));
 
-          // clear local cart (context is not exposed to mutate directly here)
-          localStorage.setItem("cartItems", JSON.stringify([]));
+        // clear cart storage so UI can read empty cart (and your CartContext will rehydrate on load)
+        localStorage.setItem("cartItems", JSON.stringify([]));
 
-          // navigate to thank-you page with order id
-          navigate(`/thank-you?order=${encodeURIComponent(orderRecord.id)}`);
-        } finally {
-          setProcessing(false);
-        }
+        setProcessing(false);
+        navigate(`/thank-you?order=${encodeURIComponent(orderRecord.id)}`);
       },
       modal: {
         ondismiss: function () {
-          // user closed the payment modal without paying
+          // user closed modal
           setProcessing(false);
         },
       },
@@ -250,8 +178,9 @@ export default function CheckoutPage() {
     try {
       const rzp = new window.Razorpay(options);
       rzp.open();
-      // do not setProcessing(false) here. it will be handled in handler or ondismiss.
+      // handler or ondismiss will reset processing
     } catch (err) {
+      console.error("Could not open Razorpay:", err);
       setProcessing(false);
       alert("Could not open payment window. Try again.");
     }
@@ -274,9 +203,7 @@ export default function CheckoutPage() {
       <div className="border-t pt-4">
         <h2 className="text-xl font-semibold mb-2">Order Summary</h2>
         <p>Total Items: {totalItems}</p>
-        <p className="font-medium">
-          Total Price: {formatINR(totalAmount *100 )}
-        </p>
+        <p className="font-medium">Total Price: {formatINR(totalAmount)}</p>
       </div>
 
       <button
