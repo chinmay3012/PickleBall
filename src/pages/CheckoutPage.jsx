@@ -71,12 +71,9 @@ function CheckoutPage() {
   const navigate = useNavigate();
 
   const [address, setAddress] = useState("");
-  const [paymentMode, setPaymentMode] = useState("Pay Online");
-
-  // State to track Razorpay script loading
   const [isRazorpayLoaded, setIsRazorpayLoaded] = useState(false);
 
-  // Load saved address from localStorage and Razorpay script
+  // Load address from localStorage
   useEffect(() => {
     const savedAddress = localStorage.getItem("userAddress");
     if (savedAddress) {
@@ -84,16 +81,12 @@ function CheckoutPage() {
     }
   }, []);
 
-  // Effect to load the Razorpay script
+  // Load Razorpay SDK
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.onload = () => {
-      setIsRazorpayLoaded(true);
-    };
-    script.onerror = () => {
-      console.error("Razorpay SDK failed to load.");
-    };
+    script.onload = () => setIsRazorpayLoaded(true);
+    script.onerror = () => console.error("Failed to load Razorpay SDK");
     document.body.appendChild(script);
 
     return () => {
@@ -107,33 +100,27 @@ function CheckoutPage() {
       return;
     }
 
-    // Check if the Razorpay script has loaded
-    if (!isRazorpayLoaded) {
-      alert("Payment gateway is not ready. Please try again in a moment.");
+    if (!isRazorpayLoaded || !window.Razorpay) {
+      alert("Payment gateway is not ready. Please wait a moment.");
       return;
     }
 
     localStorage.setItem("userAddress", address);
 
-    const totalAmount = cartItems.reduce(
-      (sum, item) =>
-        sum +
-        parseFloat(item.price.replace("Rs. ", "").replace(",", "")) *
-        item.quantity,
-      0
-    );
+    const totalAmount = cartItems.reduce((sum, item) => {
+      const priceNumber = parseFloat(item.price.replace(/[^0-9.]/g, ""));
+      return sum + priceNumber * item.quantity;
+    }, 0);
 
     const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Your Razorpay Key ID from .env
-      amount: Math.round(totalAmount * 100), // convert to paisa and ensure it's an integer
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID, // from .env
+      amount: Math.round(totalAmount * 100), // in paisa
       currency: "INR",
       name: "PickleBall Store",
       description: "Order Payment",
       handler: function (response) {
-        // This callback is called only on successful payment
         alert(
-          "Order placed successfully! Payment ID: " +
-            response.razorpay_payment_id
+          `Order placed successfully!\nPayment ID: ${response.razorpay_payment_id}`
         );
         navigate("/");
       },
@@ -166,25 +153,6 @@ function CheckoutPage() {
         />
       </div>
 
-      {/* Payment Method */}
-      <div className="mb-6">
-        <label className="block font-medium mb-2">Payment Method</label>
-        <div className="space-y-2">
-          {["Pay Online"].map((method) => (
-            <label key={method} className="flex items-center space-x-2">
-              <input
-                type="radio"
-                name="payment"
-                value={method}
-                checked={paymentMode === method}
-                onChange={(e) => setPaymentMode(e.target.value)}
-              />
-              <span>{method}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-
       {/* Order Summary */}
       <div className="border-t pt-4">
         <h2 className="text-xl font-semibold mb-2">Order Summary</h2>
@@ -194,24 +162,27 @@ function CheckoutPage() {
         <p className="font-medium">
           Total Price: Rs.{" "}
           {cartItems
-            .reduce(
-              (sum, item) =>
-                sum +
-                parseFloat(item.price.replace("Rs. ", "").replace(",", "")) *
-                  item.quantity,
-              0
-            )
+            .reduce((sum, item) => {
+              const priceNumber = parseFloat(item.price.replace(/[^0-9.]/g, ""));
+              return sum + priceNumber * item.quantity;
+            }, 0)
             .toFixed(2)}
         </p>
       </div>
 
       {/* Place Order */}
-      <button
-        onClick={handlePlaceOrder}
-        className="mt-6 w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
-      >
-        Place Order
-      </button>
+      {/* Place Order */}
+    <button
+    onClick={handlePlaceOrder}
+    disabled={!isRazorpayLoaded}
+    className={`mt-6 w-full text-white py-2 rounded ${
+        isRazorpayLoaded
+        ? "bg-green-500 hover:bg-green-600"
+        : "bg-gray-400 cursor-not-allowed"
+    }`}>
+    {isRazorpayLoaded ? "Place Order" : "Loading Payment..."}
+    </button>
+
     </div>
   );
 }
